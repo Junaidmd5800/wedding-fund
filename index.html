@@ -1,0 +1,558 @@
+<!-- Wedding Savings Tracker (PWA) -->
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Wedding Fund</title>
+<link rel="manifest" href="manifest.webmanifest" />
+<meta name="theme-color" content="#4A1D3D" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Wedding Fund" />
+<link rel="apple-touch-icon" href="icon-192.png" />
+<link rel="icon" href="icon-192.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+<style>
+  :root{
+    --ivory:#FBF7F0;
+    --card:#FFFDF9;
+    --plum:#4A1D3D;
+    --wine:#7A2E4A;
+    --gold:#C2913B;
+    --gold-lo:#A87A2E;
+    --gold-hi:#E6CC86;
+    --rose:#E9C9C9;
+    --blush:#F6E6E2;
+    --ink:#2C1822;
+    --muted:#8A7480;
+    --sage:#5B8A78;
+    --line:rgba(74,29,61,.12);
+    --shadow:0 18px 50px -24px rgba(74,29,61,.45);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    font-family:'Jost',system-ui,sans-serif;
+    color:var(--ink);
+    background:
+      radial-gradient(900px 500px at 85% -10%, rgba(230,204,134,.30), transparent 60%),
+      radial-gradient(700px 500px at -10% 110%, rgba(233,201,201,.35), transparent 55%),
+      var(--ivory);
+    -webkit-font-smoothing:antialiased;
+    line-height:1.5;
+    padding:28px 18px 70px;
+  }
+  .wrap{max-width:760px;margin:0 auto}
+
+  /* ---- Header ---- */
+  .head{text-align:center;position:relative;padding:6px 0 22px}
+  .eyebrow{
+    font-size:12px;letter-spacing:.42em;text-transform:uppercase;
+    color:var(--gold-lo);font-weight:500;margin-bottom:10px
+  }
+  .head h1{
+    font-family:'Cormorant Garamond',serif;
+    font-weight:600;font-size:clamp(34px,7vw,52px);
+    line-height:1.02;margin:0;color:var(--plum);letter-spacing:.5px
+  }
+  .head h1 em{font-style:italic;color:var(--wine)}
+  .ornament{display:flex;align-items:center;justify-content:center;gap:14px;margin:14px 0 0}
+  .ornament .rule{height:1px;width:80px;background:linear-gradient(90deg,transparent,var(--gold))}
+  .ornament .rule.r{background:linear-gradient(90deg,var(--gold),transparent)}
+  .ornament svg{color:var(--gold)}
+
+  /* ---- Hero ring card ---- */
+  .hero{
+    background:var(--card);border:1px solid var(--line);border-radius:24px;
+    box-shadow:var(--shadow);padding:30px 26px;margin-top:6px;
+    display:grid;grid-template-columns:auto 1fr;gap:30px;align-items:center;
+    position:relative;overflow:hidden
+  }
+  .hero:before{content:"";position:absolute;inset:0;border-radius:24px;padding:1px;
+    background:linear-gradient(135deg,rgba(230,204,134,.7),transparent 40%,transparent 60%,rgba(233,201,201,.6));
+    -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}
+  .ring{position:relative;width:188px;height:188px;flex:none}
+  .ring svg{transform:rotate(-90deg)}
+  .ring .center{
+    position:absolute;inset:0;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;text-align:center
+  }
+  .ring .pct{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:40px;color:var(--plum);line-height:1}
+  .ring .pctlabel{font-size:10.5px;letter-spacing:.28em;text-transform:uppercase;color:var(--muted);margin-top:4px}
+  .heroinfo h2{font-family:'Cormorant Garamond',serif;font-size:15px;letter-spacing:.2em;text-transform:uppercase;
+    color:var(--gold-lo);font-weight:600;margin:0 0 14px}
+  .figrow{display:flex;gap:26px;flex-wrap:wrap}
+  .fig{min-width:104px}
+  .fig .v{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:600;color:var(--ink);line-height:1}
+  .fig .v.saved{color:var(--sage)}
+  .fig .v.need{color:var(--wine)}
+  .fig .k{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-top:5px}
+  .daysleft{margin-top:18px;font-size:13.5px;color:var(--plum)}
+  .daysleft b{color:var(--wine);font-weight:600}
+
+  /* ---- Section ---- */
+  .section{margin-top:26px}
+  .section > .label{
+    display:flex;align-items:center;gap:12px;margin:0 4px 14px;
+    font-size:12px;letter-spacing:.32em;text-transform:uppercase;color:var(--gold-lo);font-weight:500
+  }
+  .section > .label:after{content:"";flex:1;height:1px;background:var(--line)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);padding:22px}
+
+  /* ---- Weekly check-in ---- */
+  .checkin{background:linear-gradient(135deg,#fff,var(--blush));border-color:rgba(122,46,74,.18)}
+  .checkin.due{animation:pulseglow 2.6s ease-in-out infinite}
+  @keyframes pulseglow{0%,100%{box-shadow:var(--shadow)}50%{box-shadow:0 18px 50px -20px rgba(122,46,74,.55)}}
+  .checkin h3{font-family:'Cormorant Garamond',serif;font-size:25px;font-weight:600;color:var(--plum);margin:0 0 4px}
+  .checkin p{margin:0 0 16px;color:var(--muted);font-size:14px}
+  .ci-input{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .moneyfield{position:relative;flex:1;min-width:160px}
+  .moneyfield span{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--gold-lo);font-weight:500}
+  input[type=number],input[type=date]{
+    width:100%;padding:13px 14px 13px 28px;border:1px solid var(--line);border-radius:13px;
+    font-family:'Jost',sans-serif;font-size:16px;color:var(--ink);background:#fff;outline:none
+  }
+  input[type=date]{padding-left:14px}
+  input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(194,145,59,.16)}
+  .btn{
+    border:none;cursor:pointer;font-family:'Jost',sans-serif;font-weight:500;font-size:14.5px;
+    letter-spacing:.02em;padding:13px 22px;border-radius:13px;transition:.18s transform,.18s box-shadow
+  }
+  .btn:active{transform:translateY(1px)}
+  .btn-gold{background:linear-gradient(135deg,var(--gold-hi),var(--gold));color:#3a2a08;
+    box-shadow:0 8px 20px -8px rgba(194,145,59,.7);font-weight:600}
+  .btn-gold:hover{box-shadow:0 10px 26px -8px rgba(194,145,59,.85)}
+  .btn-ghost{background:transparent;color:var(--wine);border:1px solid rgba(122,46,74,.3)}
+  .btn-ghost:hover{background:rgba(122,46,74,.06)}
+  .ci-skip{margin-top:12px;background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;text-decoration:underline;font-family:inherit}
+  .lastci{font-size:12.5px;color:var(--sage);margin-top:14px;display:flex;align-items:center;gap:6px}
+
+  /* ---- Plan strip ---- */
+  .plan{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .plan .tile{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px 16px;text-align:center;box-shadow:var(--shadow)}
+  .plan .tile .v{font-family:'Cormorant Garamond',serif;font-size:27px;font-weight:600;color:var(--plum);line-height:1}
+  .plan .tile .v.hl{color:var(--gold-lo)}
+  .plan .tile .k{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-top:6px}
+
+  /* ---- Checklist ---- */
+  .bar-wrap{margin:2px 2px 18px}
+  .bar-top{display:flex;justify-content:space-between;font-size:12.5px;color:var(--muted);margin-bottom:7px}
+  .bar-top b{color:var(--plum)}
+  .bar{height:8px;border-radius:99px;background:var(--blush);overflow:hidden}
+  .bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--gold),var(--gold-hi));transition:width .6s cubic-bezier(.2,.8,.2,1)}
+  ul.list{list-style:none;margin:0;padding:0}
+  ul.list li{
+    display:flex;align-items:center;gap:14px;padding:14px 6px;border-bottom:1px solid var(--line)
+  }
+  ul.list li:last-child{border-bottom:none}
+  .check{
+    width:26px;height:26px;border-radius:8px;border:1.6px solid var(--gold);flex:none;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;background:#fff;transition:.18s
+  }
+  .check svg{opacity:0;transform:scale(.5);transition:.18s;color:#fff}
+  li.done .check{background:linear-gradient(135deg,var(--gold-hi),var(--gold));border-color:var(--gold)}
+  li.done .check svg{opacity:1;transform:scale(1)}
+  .iname{flex:1;font-size:15.5px;color:var(--ink);transition:.2s}
+  li.done .iname{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--rose)}
+  .iamt{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:600;color:var(--wine)}
+  li.done .iamt{color:var(--sage)}
+  .delx{background:none;border:none;color:var(--rose);font-size:18px;cursor:pointer;padding:2px 4px;line-height:1;opacity:.6}
+  .delx:hover{opacity:1;color:var(--wine)}
+  .addrow{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+  .addrow .moneyfield{min-width:120px;flex:none;width:140px}
+  .addrow input[type=text]{flex:1;min-width:150px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;font-family:inherit;font-size:15px;background:#fff;outline:none}
+  .addrow input[type=text]:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(194,145,59,.16)}
+
+  /* ---- Settings ---- */
+  .settings .row{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:13px 2px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .settings .row:last-child{border-bottom:none}
+  .settings .row .lab{font-size:14.5px;color:var(--ink)}
+  .settings .row .sub{font-size:12px;color:var(--muted);margin-top:2px}
+  .settings input{max-width:170px}
+  .toggle{position:relative;width:50px;height:28px;border-radius:99px;background:var(--rose);cursor:pointer;border:none;transition:.2s;flex:none}
+  .toggle.on{background:var(--sage)}
+  .toggle:after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:.2s;box-shadow:0 2px 5px rgba(0,0,0,.2)}
+  .toggle.on:after{left:25px}
+
+  .foot{text-align:center;color:var(--muted);font-size:12px;margin-top:30px;line-height:1.7}
+  .foot svg{color:var(--gold);vertical-align:-2px}
+
+  /* toast */
+  #toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);
+    background:var(--plum);color:#fff;padding:13px 22px;border-radius:14px;font-size:14px;
+    box-shadow:0 14px 30px -10px rgba(74,29,61,.6);opacity:0;pointer-events:none;transition:.3s;z-index:50;max-width:90vw;text-align:center}
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  @media(max-width:560px){
+    .hero{grid-template-columns:1fr;justify-items:center;text-align:center}
+    .heroinfo{width:100%}
+    .figrow{justify-content:center}
+    .plan{grid-template-columns:1fr;}
+    .plan .tile{display:flex;align-items:baseline;justify-content:center;gap:10px;text-align:center}
+    .plan .tile .k{margin-top:0}
+  }
+</style>
+
+<div class="wrap">
+  <div class="head">
+    <div class="eyebrow">October 2026 · Our Wedding Fund</div>
+    <h1>The Road to <em>I Do</em></h1>
+    <div class="ornament">
+      <span class="rule"></span>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="9" cy="14" r="5"/><circle cx="15" cy="14" r="5"/><path d="M9 9l1.5-3M15 9l-1.5-3M10.5 6l1.5 1.5L13.5 6"/></svg>
+      <span class="rule r"></span>
+    </div>
+  </div>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="ring">
+      <svg width="188" height="188" viewBox="0 0 188 188">
+        <defs>
+          <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#E6CC86"/><stop offset="1" stop-color="#C2913B"/>
+          </linearGradient>
+        </defs>
+        <circle cx="94" cy="94" r="82" fill="none" stroke="#F1E4D6" stroke-width="13"/>
+        <circle id="ringfill" cx="94" cy="94" r="82" fill="none" stroke="url(#g)" stroke-width="13"
+          stroke-linecap="round" stroke-dasharray="515" stroke-dashoffset="515"
+          style="transition:stroke-dashoffset 1.1s cubic-bezier(.2,.8,.2,1)"/>
+      </svg>
+      <div class="center">
+        <div class="pct" id="ringpct">0%</div>
+        <div class="pctlabel">Funded</div>
+      </div>
+    </div>
+    <div class="heroinfo">
+      <h2>Savings Progress</h2>
+      <div class="figrow">
+        <div class="fig"><div class="v saved" id="fSaved">$0</div><div class="k">Saved so far</div></div>
+        <div class="fig"><div class="v" id="fGoal">$0</div><div class="k">Total goal</div></div>
+        <div class="fig"><div class="v need" id="fNeed">$0</div><div class="k">Still to save</div></div>
+      </div>
+      <div class="daysleft" id="daysleft"></div>
+    </div>
+  </div>
+
+  <!-- WEEKLY CHECK-IN -->
+  <div class="section">
+    <div class="label">This Week</div>
+    <div class="card checkin" id="checkinCard">
+      <h3 id="ciTitle">Did you save anything this week?</h3>
+      <p id="ciSub">Pop in the amount you set aside and I'll update your fund.</p>
+      <div class="ci-input">
+        <label class="moneyfield"><span>$</span><input type="number" id="ciAmt" placeholder="0" min="0" step="50"/></label>
+        <button class="btn btn-gold" id="ciSave">Add to fund</button>
+      </div>
+      <button class="ci-skip" id="ciSkip">I didn't save this week →</button>
+      <div class="lastci" id="lastci" style="display:none"></div>
+    </div>
+  </div>
+
+  <!-- PLAN -->
+  <div class="section">
+    <div class="label">Your Pace</div>
+    <div class="plan">
+      <div class="tile"><div class="v hl" id="pWeek">$0</div><div class="k">Per week</div></div>
+      <div class="tile"><div class="v hl" id="pMonth">$0</div><div class="k">Per month</div></div>
+      <div class="tile"><div class="v" id="pWeeks">0</div><div class="k">Weeks left</div></div>
+    </div>
+  </div>
+
+  <!-- CHECKLIST -->
+  <div class="section">
+    <div class="label">Wedding Checklist</div>
+    <div class="card">
+      <div class="bar-wrap">
+        <div class="bar-top"><span><b id="clDone">0</b> of <span id="clTotal">0</span> booked</span><span><b id="clPaid">$0</b> handled</span></div>
+        <div class="bar"><i id="clBar" style="width:0%"></i></div>
+      </div>
+      <ul class="list" id="list"></ul>
+      <div class="addrow">
+        <input type="text" id="newName" placeholder="Add an expense…" />
+        <label class="moneyfield"><span>$</span><input type="number" id="newAmt" placeholder="0" min="0" step="100"/></label>
+        <button class="btn btn-ghost" id="addBtn">Add</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div class="section">
+    <div class="label">Settings</div>
+    <div class="card settings">
+      <div class="row">
+        <div><div class="lab">Wedding date</div><div class="sub">Used to work out your weekly pace</div></div>
+        <input type="date" id="setDate" />
+      </div>
+      <div class="row">
+        <div><div class="lab">Adjust saved total</div><div class="sub">Set your real balance any time</div></div>
+        <label class="moneyfield" style="max-width:170px"><span>$</span><input type="number" id="setSaved" min="0" step="100"/></label>
+      </div>
+      <div class="row">
+        <div><div class="lab">Weekly reminder</div><div class="sub" id="notifSub">Get a nudge each week to log your saving</div></div>
+        <button class="toggle" id="notifToggle" aria-label="Toggle weekly reminder"></button>
+      </div>
+      <div class="row">
+        <div><div class="lab">Reset everything</div><div class="sub">Clears all saved data on this device</div></div>
+        <button class="btn btn-ghost" id="resetBtn">Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot">
+    Built for your big day
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7.5-4.6-10-9.3C.4 8.4 2 5 5.3 5 7.3 5 8.7 6.1 12 9c3.3-2.9 4.7-4 6.7-4C22 5 23.6 8.4 22 11.7 19.5 16.4 12 21 12 21z"/></svg><br/>
+    Your data lives on your device. Weekly reminders work while this app is open in your browser.
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* ---------- storage (localStorage: works on any normal web host) ---------- */
+const KEY='wedding-tracker:v1';
+const Store={
+  async get(k){
+    try{ const v=localStorage.getItem(k); return v?JSON.parse(v):null; }catch(e){ return null; }
+  },
+  async set(k,v){
+    try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){}
+  }
+};
+
+/* ---------- default state from the user's wedding ---------- */
+const DEFAULT={
+  weddingDate:'2026-10-14',
+  saved:27000,
+  expenses:[
+    {id:'e1',name:'Gold',amount:10000,done:false},
+    {id:'e2',name:'Wedding hall',amount:16000,done:false},
+    {id:'e3',name:'Photographer',amount:2000,done:false},
+    {id:"e4",name:"Bride's clothes",amount:5000,done:false},
+    {id:'e5',name:'Honeymoon',amount:8000,done:false},
+    {id:'e6',name:'Airbnb',amount:2000,done:false},
+    {id:'e7',name:'Other functions',amount:1500,done:false},
+    {id:'e8',name:'Qawwali',amount:2500,done:false},
+    {id:'e9',name:'Miscellaneous',amount:2000,done:false}
+  ],
+  history:[],          // {date, amount}
+  lastCheckIn:null,    // ISO date string of last weekly action
+  notify:false
+};
+let S=null;
+
+/* ---------- helpers ---------- */
+const $=s=>document.querySelector(s);
+const fmt=n=>'$'+Math.round(n).toLocaleString('en-US');
+const today=()=>{const d=new Date();d.setHours(0,0,0,0);return d;};
+function daysBetween(a,b){return Math.round((b-a)/86400000);}
+function goal(){return S.expenses.reduce((t,e)=>t+(+e.amount||0),0);}
+function weeksLeft(){
+  const wd=new Date(S.weddingDate+'T00:00:00');
+  return Math.max(0,Math.ceil((wd-today())/(7*86400000)));
+}
+function monthsLeft(){
+  const wd=new Date(S.weddingDate+'T00:00:00'), t=today();
+  let m=(wd.getFullYear()-t.getFullYear())*12+(wd.getMonth()-t.getMonth());
+  if(wd.getDate()<t.getDate())m-=1;
+  return Math.max(0,m);
+}
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2600);}
+function save(){Store.set(KEY,S);}
+
+/* ---------- render ---------- */
+function render(){
+  const g=goal(), saved=Math.max(0,S.saved), need=Math.max(0,g-saved);
+  const pct=g>0?Math.min(100,(saved/g)*100):0;
+
+  $('#fSaved').textContent=fmt(saved);
+  $('#fGoal').textContent=fmt(g);
+  $('#fNeed').textContent=fmt(need);
+  $('#ringpct').textContent=Math.round(pct)+'%';
+  $('#ringfill').style.strokeDashoffset=515-(515*pct/100);
+
+  const wl=weeksLeft(), ml=monthsLeft();
+  const wd=new Date(S.weddingDate+'T00:00:00');
+  const dleft=Math.max(0,daysBetween(today(),wd));
+  $('#daysleft').innerHTML = need<=0
+    ? `🎉 You've hit your goal — the whole wedding is funded!`
+    : `<b>${dleft}</b> days to go &middot; about <b>${wl}</b> weeks until the big day`;
+
+  const perWeek=wl>0?need/wl:need;
+  const perMonth=ml>0?need/ml:need;
+  $('#pWeek').textContent=need<=0?'$0':fmt(perWeek);
+  $('#pMonth').textContent=need<=0?'$0':fmt(perMonth);
+  $('#pWeeks').textContent=wl;
+
+  // checklist
+  const list=$('#list'); list.innerHTML='';
+  let doneCount=0, paid=0;
+  S.expenses.forEach(e=>{
+    if(e.done){doneCount++;paid+=(+e.amount||0);}
+    const li=document.createElement('li');
+    if(e.done)li.classList.add('done');
+    li.innerHTML=`
+      <div class="check" data-id="${e.id}" role="checkbox" aria-checked="${e.done}" tabindex="0">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+      </div>
+      <span class="iname">${escapeHtml(e.name)}</span>
+      <span class="iamt">${fmt(e.amount)}</span>
+      <button class="delx" data-del="${e.id}" title="Remove">×</button>`;
+    list.appendChild(li);
+  });
+  $('#clDone').textContent=doneCount;
+  $('#clTotal').textContent=S.expenses.length;
+  $('#clPaid').textContent=fmt(paid);
+  $('#clBar').style.width=(S.expenses.length?(doneCount/S.expenses.length*100):0)+'%';
+
+  // settings reflect
+  $('#setDate').value=S.weddingDate;
+  $('#setSaved').value=Math.round(saved);
+  $('#notifToggle').classList.toggle('on',!!S.notify);
+
+  renderCheckin();
+}
+
+function renderCheckin(){
+  const card=$('#checkinCard'), last=$('#lastci');
+  const due = !S.lastCheckIn || daysBetween(new Date(S.lastCheckIn),today())>=7;
+  card.classList.toggle('due',due);
+  if(due){
+    $('#ciTitle').textContent='Did you save anything this week?';
+    $('#ciSub').textContent="Pop in the amount you set aside and I'll update your fund.";
+  }else{
+    $('#ciTitle').textContent='Nicely done this week 💛';
+    $('#ciSub').textContent='Your next check-in unlocks in '+(7-daysBetween(new Date(S.lastCheckIn),today()))+' day(s). Add more any time.';
+  }
+  if(S.lastCheckIn){
+    last.style.display='flex';
+    last.innerHTML=`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg> Last logged ${new Date(S.lastCheckIn).toLocaleDateString('en-US',{month:'short',day:'numeric'})}`;
+  }
+}
+
+function escapeHtml(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
+/* ---------- actions ---------- */
+function addToFund(amt){
+  amt=+amt;
+  if(!amt||amt<=0){toast('Enter an amount first');return;}
+  S.saved=Math.max(0,(+S.saved||0)+amt);
+  S.history.push({date:new Date().toISOString(),amount:amt});
+  S.lastCheckIn=new Date().toISOString();
+  $('#ciAmt').value='';
+  save();render();
+  toast('Added '+fmt(amt)+' — you saved '+fmt(S.saved)+' so far 🎉');
+}
+
+function wire(){
+  $('#ciSave').onclick=()=>addToFund($('#ciAmt').value);
+  $('#ciAmt').addEventListener('keydown',e=>{if(e.key==='Enter')addToFund($('#ciAmt').value);});
+  $('#ciSkip').onclick=()=>{
+    S.lastCheckIn=new Date().toISOString();save();render();
+    toast("No worries — caught you next week 💛");
+  };
+
+  $('#list').addEventListener('click',e=>{
+    const c=e.target.closest('.check'); const d=e.target.closest('[data-del]');
+    if(c){toggle(c.dataset.id);}
+    if(d){removeItem(d.dataset.del);}
+  });
+  $('#list').addEventListener('keydown',e=>{
+    const c=e.target.closest('.check');
+    if(c&&(e.key===' '||e.key==='Enter')){e.preventDefault();toggle(c.dataset.id);}
+  });
+
+  $('#addBtn').onclick=()=>{
+    const n=$('#newName').value.trim(), a=+$('#newAmt').value;
+    if(!n){toast('Give the expense a name');return;}
+    if(!a||a<=0){toast('Add an amount');return;}
+    S.expenses.push({id:'e'+Date.now(),name:n,amount:a,done:false});
+    $('#newName').value='';$('#newAmt').value='';
+    save();render();toast('Added “'+n+'”');
+  };
+  $('#newAmt').addEventListener('keydown',e=>{if(e.key==='Enter')$('#addBtn').click();});
+
+  $('#setDate').onchange=e=>{S.weddingDate=e.target.value||S.weddingDate;save();render();};
+  $('#setSaved').onchange=e=>{S.saved=Math.max(0,+e.target.value||0);save();render();toast('Balance updated');};
+
+  $('#notifToggle').onclick=toggleNotify;
+
+  $('#resetBtn').onclick=()=>{
+    if(confirm('Reset everything back to the original plan? This clears your logged savings on this device.')){
+      S=JSON.parse(JSON.stringify(DEFAULT));save();render();toast('Reset to your starting plan');
+    }
+  };
+}
+
+function toggle(id){
+  const e=S.expenses.find(x=>x.id===id);if(!e)return;
+  e.done=!e.done;save();render();
+  if(e.done)toast('“'+e.name+'” marked as booked ✓');
+}
+function removeItem(id){
+  const e=S.expenses.find(x=>x.id===id);if(!e)return;
+  if(confirm('Remove “'+e.name+'” ('+fmt(e.amount)+') from the list?')){
+    S.expenses=S.expenses.filter(x=>x.id!==id);save();render();
+  }
+}
+
+/* ---------- notifications (best-effort, while app is open) ---------- */
+async function toggleNotify(){
+  if(S.notify){S.notify=false;save();render();$('#notifSub').textContent='Get a nudge each week to log your saving';return;}
+  if(!('Notification' in window)){toast('This browser can’t show notifications');return;}
+  let perm=Notification.permission;
+  if(perm!=='granted')perm=await Notification.requestPermission();
+  if(perm==='granted'){
+    S.notify=true;save();render();
+    $('#notifSub').textContent='On — you’ll get a weekly nudge while this app is open';
+    maybeNotify(true);
+  }else{
+    $('#notifSub').textContent='Blocked in browser settings — turn it on there to enable';
+    toast('Notifications are blocked in your browser');
+  }
+}
+function maybeNotify(force){
+  if(!S.notify||!('Notification' in window)||Notification.permission!=='granted')return;
+  const due=!S.lastCheckIn||daysBetween(new Date(S.lastCheckIn),today())>=7;
+  if(due||force){
+    const need=Math.max(0,goal()-S.saved), wl=weeksLeft();
+    const per=wl>0?fmt(need/wl):fmt(need);
+    try{new Notification('💍 Wedding fund check-in',{
+      body:need<=0?'You\'re fully funded — congratulations!':`Time to set aside about ${per} this week. Open the app to log it.`
+    });}catch(e){}
+  }
+}
+
+/* ---------- boot ---------- */
+(async function init(){
+  // register service worker for offline + installability
+  if('serviceWorker' in navigator){
+    try{
+      const reg=await navigator.serviceWorker.register('sw.js');
+      // best-effort weekly background nudge on Chrome/Android installed PWAs
+      if('periodicSync' in reg){
+        try{
+          const st=await navigator.permissions.query({name:'periodic-background-sync'});
+          if(st.state==='granted'){
+            await reg.periodicSync.register('weekly-checkin',{minInterval:7*24*60*60*1000});
+          }
+        }catch(e){}
+      }
+    }catch(e){}
+  }
+
+  const saved=await Store.get(KEY);
+  S = saved || JSON.parse(JSON.stringify(DEFAULT));
+  // make sure new fields exist if loading old data
+  S.expenses=S.expenses||DEFAULT.expenses;
+  S.history=S.history||[];
+  if(typeof S.notify==='undefined')S.notify=false;
+  wire();render();
+  setTimeout(()=>maybeNotify(false),1500);
+  // re-check roughly hourly in case the tab stays open across a week boundary
+  setInterval(()=>{renderCheckin();maybeNotify(false);},3600000);
+})();
+</script>
